@@ -113,10 +113,26 @@ def admin():
 @app.route('/')
 def index():
     conn = get_db_connection()
-    watches = conn.execute('SELECT id, name, description FROM watches').fetchall()
+    watches = conn.execute('SELECT id, name, price, brand FROM watches').fetchall()
     users = conn.execute('SELECT id, username, email, role FROM users').fetchall()
     conn.close()
     return render_template('index.html', watches=watches, users=users)
+
+# Viewing a single watch
+@app.route('/view_watch/<int:id>')
+def view_watch(id):
+    conn = get_db_connection()
+    watch = conn.execute('SELECT * FROM watches WHERE id=?', (id,)).fetchone()
+    conn.close()
+
+    if watch:
+        # render product details page if product exists
+        return render_template('watch.html', watch=watch)
+    else:
+        # return error if product is not found
+        return flash('Product not found', category='danger')
+
+
 
 # Add or Edit a watch item
 @app.route('/edit/<int:id>', methods=('GET', 'POST'))

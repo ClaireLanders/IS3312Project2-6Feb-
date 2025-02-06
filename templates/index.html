@@ -1,57 +1,35 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Item List</h1>
+
 <a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Item</a>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in watches %} <!--SHOULD THIS BE FOR WATCH IN WATCHES ???-->
-        <tr>
-            <td>
-                {% if item.id %}
-                    <img src="{{ url_for('get_image', id=item.id) }}" alt="Item Image" width="100">
-                {% else %}
-                    No Image
-                {% endif %}
-            </td>
-            <td>{{ item.name }}</td>
-            <td>{{ item.description }}</td>
-            <td>
-                <a href="{{ url_for('edit', id=item.id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-</table>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{user.username}}</td>
-            <td>{{ user.email}}</td>
-            <td>{{ user.role }}</td>
-            <!-- ADDING THE EDIT AND DELETE BUTTONS FROM THE ABOVE EDITING -->
-            <td>
-                <a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!--Section-->
+<section class="py-5">
+<div class="container px-4 px-lg-5 mt-5">
+    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        {% for watch in watches %}
+        <div class="col mb-5">
+            <div class="card h-100">
+                <!-- Watch Image-->
+                <img class="card-img-top" src="{{ url_for('get_image', id=watch.id) }}" alt="..." width="100">
+                <!-- Watch Details-->
+                <div class="card-body p-4">
+                    <div class="text-center">
+                        <!-- Watch name-->
+                        <h5 class="fw-bolder">{{ watch.brand }} {{ watch.name }}</h5>
+                        <!-- Watch price-->
+                        €{{watch.price}}
+                    </div>
+                </div>
+                <!--Button-->
+                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ url_for('view_watch',id=watch.id) }}">View</a></div>
+                </div>
+            </div>
+        </div>
+        {%  endfor %}
+
+    </div>
+</div>
 {% endblock %}
+
+
