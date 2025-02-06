@@ -48,6 +48,39 @@ def login():
     # Render login page
     return render_template('login.html')
 
+# Registration route
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if request.method == 'POST':
+        # Get registration details from the form
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        role = 'customer'  # Default role
+
+        # Validate if the username or email already exists
+        conn = get_db_connection()
+        existing_user = conn.execute('SELECT * FROM users WHERE username = ? OR email = ?', (username, email)).fetchone()
+        conn.close()
+
+        if existing_user:
+            flash('Username or Email already exists. Please choose a different one.', category='danger')
+            return redirect(url_for('register'))
+
+        # Insert the new user into the database
+        conn = get_db_connection()
+        conn.execute('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
+                     (username, password, email, role))
+        conn.commit()
+        conn.close()
+
+        flash('Account created successfully! Please log in.', category='success')
+        return redirect(url_for('login'))
+
+    # Render the registration page
+    return render_template('register.html')
+
+
 # Logout route
 @app.route('/logout')
 def logout():
