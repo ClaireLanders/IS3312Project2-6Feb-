@@ -134,7 +134,7 @@ def view_watch(id):
 
 
 
-# Add or Edit a watch item
+# Create or Edit a watch item - maybe make this admin only ?
 @app.route('/edit/<int:id>', methods=('GET', 'POST'))
 @app.route('/add', methods=('GET', 'POST'), defaults={'id': None})
 def edit(id):
@@ -237,8 +237,6 @@ def users():
     return render_template('users.html', users=users)
 
 
-
-
 # Delete user
 @app.route('/delete_user/<int:id>')
 def delete_user(id):
@@ -247,6 +245,63 @@ def delete_user(id):
     conn.commit()
     conn.close()
     return redirect(url_for('index'))
+
+# Cart
+# Add to cart
+@app.route('/add_to_cart/<int:id>', methods=['POST'])
+def add_to_cart(id):
+    # initialise the session cart if it doesn't exist
+    if 'cart' not in session:
+        session['cart'] = []
+
+    # Check if the user is logged in
+    if 'username' not in session:
+        flash('You need to log in to add to cart.', category='error')
+        return redirect(url_for('login'))
+
+    # Check if the product is already in the cart
+    cart = session['cart']
+    if id in cart:
+        flash('Watch already in your cart.', category='info')
+    else:
+        # Add the watch ID to the cart
+        cart.append(id)
+        session['cart'] = cart  # Update session data
+        flash('Watch added to your cart.', category='success')
+
+    return redirect(url_for('view_cart'))
+
+
+@app.route('/cart')
+def view_cart():
+    # Retrieve cart from the session
+    cart = session.get('cart', [])
+
+    # Fetch watch details for the IDs in the cart
+    conn = get_db_connection()
+    watches = [conn.execute('SELECT * FROM watches WHERE id = ?', (id,)).fetchone() for id in cart]
+    conn.close()
+
+    # Filter out None values in case of invalid or deleted watch IDs
+    watches = [watch for watch in watches if watch is not None]
+
+    return render_template('cart.html', watches=watches)
+
+
+# Remove product from cart
+@app.route('/remove_from_cart/<int:id>', methods=['POST'])
+def remove_from_cart(id):
+    # Get the current cart from session
+    cart = session.get('cart', [])
+    if id in cart:
+        # Remove product from cart if it exists
+        cart.remove(id)
+        session['cart'] = cart
+        flash('product removed from your cart.', category='success')
+    else:
+        # Flash an error message if product is not in cart
+        flash('product not found in your cart.', category='error')
+    return redirect(url_for('view_cart'))
 
 
 if __name__ == '__main__':

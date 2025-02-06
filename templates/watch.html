@@ -4,13 +4,22 @@
         <section class="py-5">
             <div class="container px-4 px-lg-5 my-5">
                 <div class="row gx-4 gx-lg-5 align-items-center">
-                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{ url_for('get_image', id=watch.id) }}" alt="..." width="100"></div>
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{ url_for('get_image', id=watch.id) }}" alt="..." ></div>
                     <div class="col-md-6">
                         <h1 class="display-5 fw-bolder">{{ watch.brand }} {{ watch.name }}</h1>
                         <div class="fs-5 mb-5">
                             <span>€{{watch.price}}</span>
                         </div>
                         <p class="lead">{{ watch.description }}</p>
+                        <div class="d-flex">
+                            <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem"/>
+                            <form action="{{ url_for('add_to_cart', id=watch.id) }}" method="POST">
+                                <button class="btn btn-outline-dark flex-shrink-0" type="submit">
+                                    <i class="bi-cart-fill me-1"></i>
+                                    Add to cart
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
