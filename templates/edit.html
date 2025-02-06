@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ item and 'Edit Item' or 'Add Item' }}</h1>
+<form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ item.name if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="brand" class="form-label">Brand</label>
+        <input type="text" class="form-control" id="brand" name="brand" value="{{ item.brand if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="price" class="form-label">Price</label>
+        <input type="text" class="form-control" id="price" name="price" value="{{ item.price if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="style" class="form-label">Style</label>
+        <input type="text" class="form-control" id="style" name="style" value="{{ item.style if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="movement_type" class="form-label">Movement Type</label>
+        <input type="text" class="form-control" id="movement_type" name="movement_type" value="{{ item.movement_type if item else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="bracelet_material" class="form-label">Bracelet Material</label>
+        <input type="text" class="form-control" id="bracelet_material" name="bracelet_material" value="{{ item.bracelet_material if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="bracelet_colour" class="form-label">Bracelet Colour</label>
+        <input type="text" class="form-control" id="bracelet_colour" name="bracelet_colour" value="{{ item.bracelet_colour if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="clasp_type" class="form-label">Clasp Type</label>
+        <input type="text" class="form-control" id="clasp_type" name="clasp_type" value="{{ item.clasp_type if item else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="clasp_material" class="form-label">Clasp Material</label>
+        <input type="text" class="form-control" id="clasp_material" name="clasp_material" value="{{ item.clasp_material if item else '' }}" >
+    </div>
+    <div class="mb-3">
+        <label for="case_diameter" class="form-label">Case Diameter</label>
+        <input type="text" class="form-control" id="case_diameter" name="case_diameter" value="{{ item.case_diameter if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="case_material" class="form-label">Case Material</label>
+        <input type="text" class="form-control" id="case_material" name="case_material" value="{{ item.case_material if item else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="water_resistance" class="form-label">Water Resistance</label>
+        <input type="text" class="form-control" id="water_resistance" name="water_resistance" value="{{ item.water_resistance if item else '' }}" >
+    </div>
+    <div class="mb-3">
+        <label for="bezel_material" class="form-label">Bezel Material</label>
+        <input type="text" class="form-control" id="bezel_material" name="bezel_material" value="{{ item.bezel_material if item else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="crystal" class="form-label">Crystal</label>
+        <input type="text" class="form-control" id="crystal" name="crystal" value="{{ item.crystal if item else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="dial" class="form-label">Dial</label>
+        <input type="text" class="form-control" id="dial" name="dial" value="{{ item.dial if item else '' }}" >
+    </div>
+    <div class="mb-3">
+        <label for="power_reserve" class="form-label">Power Reserve</label>
+        <input type="text" class="form-control" id="power_reserve" name="power_reserve" value="{{ item.power_reserve if item else '' }}">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" required>{{ item.description if item else '' }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label for="stock" class="form-label">Stock</label>
+        <input type="text" class="form-control" id="stock" name="stock" value="{{ item.stock if item else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="image" class="form-label">Upload Image</label>
+        <input type="file" class="form-control" id="image" name="image">
+    </div>
+    {% if item and item.id %}
+        <p>Current Image:</p>
+        <img src="{{ url_for('get_image', id=item.id) }}" width="150">
+    {% endif %}
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Item List</h1>
+<a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Item</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in watches %} <!--SHOULD THIS BE FOR WATCH IN WATCHES ???-->
+        <tr>
+            <td>
+                {% if item.id %}
+                    <img src="{{ url_for('get_image', id=item.id) }}" alt="Item Image" width="100">
+                {% else %}
+                    No Image
+                {% endif %}
+            </td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.description }}</td>
+            <td>
+                <a href="{{ url_for('edit', id=item.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{{ url_for('delete', id=item.id) }}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+</table>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{user.username}}</td>
+            <td>{{ user.email}}</td>
+            <td>{{ user.role }}</td>
+            <!-- ADDING THE EDIT AND DELETE BUTTONS FROM THE ABOVE EDITING -->
+            <td>
+                <a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

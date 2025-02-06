@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<!--MIGHT JUST WANT TO ADD USER NOT EDIT !!-->
+<h1>{{ user and  'Add User' }}</h1>
+<form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" id="username" name="username" value="{{ user.username if user else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="text" class="form-control" id="password" name="password" value="{{ user.password if user else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="text" class="form-control" id="email" name="email" value="{{ user.email if user else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="role" class="form-label">Role</label>
+        <input type="text" class="form-control" id="role" name="role" value="{{ user.role if user else '' }}" required>
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
