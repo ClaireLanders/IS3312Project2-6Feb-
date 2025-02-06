@@ -1,14 +1,79 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
 import sqlite3
 import io
 
 app = Flask(__name__)
+# setting a secret key for secure sessions
+app.secret_key = 'cab55a52341d5763e41fb92c77241b02'
 
 # Database connection function
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row  # Access rows as dictionaries
     return conn
+
+
+# Login route from project deliverable 1
+# Login route
+@app.route('/login',methods=['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        # Get login credentials from the form
+        username = request.form['username']
+        password = request.form['password']
+
+
+        # Fetch user from the database using the username
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+        conn.close()
+
+        # check if user exists
+        if user is None:
+            flash('Invalid username or password', category='danger')
+            return redirect(url_for('login'))
+
+        # Validate password
+        if user['password'] != password:
+            flash('Incorrect password', category='danger')
+            return redirect(url_for('login'))
+
+        # Set session based on user type and redirect accordingly
+        session['username'] = user['username']
+        if user['role'] == 'admin':
+            return redirect(url_for('admin'))
+        elif user['role'] == 'customer':
+            return redirect(url_for('index'))
+
+    # Render login page
+    return render_template('login.html')
+
+# Logout route
+@app.route('/logout')
+def logout():
+    # Clear the entire session to fully log the user out
+    session.clear()
+    # Redirect to the login page or home page
+    return redirect(url_for('login'))
+
+# Admin home route - requires user to be logged in as an admin
+@app.route('/adminhome')
+def admin():
+    # Check if the user is logged in via session
+    if 'username' not in session:
+        flash('You must be logged in to access the admin page.', category='danger')
+        return redirect(url_for('login'))
+
+    # Get all registered user for the data on the admin page and render template
+    conn = get_db_connection();
+    users = conn.execute('SELECT * FROM users ').fetchall()
+    conn.close()
+
+    # get the logged - in username
+    username = session['username']
+
+    # render the admin page with user data
+    return render_template('admin_home.html', users=users, username=username)
 
 # Home page to display all watches and users at the moment!
 # it currently only shows name and description, but I will add brand and other stuff later
