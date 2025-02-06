@@ -113,10 +113,36 @@ def admin():
 @app.route('/')
 def index():
     conn = get_db_connection()
-    watches = conn.execute('SELECT id, name, price, brand FROM watches').fetchall()
+
+    # Get the brand filter value from the request
+    brand_filter = request.args.get('brand')
+
+    # Print the brand filter value for debugging
+    print(f"Brand Filter: {brand_filter}")
+
+    # Base query to fetch watches
+    query = 'SELECT id, name, price, brand FROM watches'
+    params = []
+
+    # Apply filter if brand is provided
+    if brand_filter:
+        query += ' WHERE brand = ?'
+        params.append(brand_filter)
+
+    # Print the query and parameters for debugging
+    print(f"Query: {query}, Params: {params}")
+
+    # Fetch the filtered or unfiltered watches
+    watches = conn.execute(query, params).fetchall()
+
+    # Fetch users (not necessary for the index, but included in your original code)
     users = conn.execute('SELECT id, username, email, role FROM users').fetchall()
+
     conn.close()
+
     return render_template('index.html', watches=watches, users=users)
+
+
 
 # Viewing a single watch
 @app.route('/view_watch/<int:id>')

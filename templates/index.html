@@ -1,6 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-
+<!-- Filter Form -->
+<form method="GET" action="{{ url_for('index') }}" class="mb-4">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="brand" class="form-label">Filter by Brand:</label>
+      <select name="brand" id="brand" class="form-select">
+        <option value="">All Brands</option>
+        <option value="Rolex" {% if request.args.get('brand') == 'Rolex' %}selected{% endif %}>Rolex</option>
+        <option value="Omega" {% if request.args.get('brand') == 'Omega' %}selected{% endif %}>Omega</option>
+        <option value="Patek Philippe" {% if request.args.get('brand') == 'Patek Philippe' %}selected{% endif %}>Patek Philippe</option>
+        <option value="Audemars Piguet"{% if request.args.get('brand') == 'Audemars Piguet' %}selected{% endif %}>Audemars Piguet</option>
+      </select>
+    </div>
+    <div class="col-md-2 mt-4">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </div>
+</form>
 <a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Item</a>
 <!--Section-->
 <section class="py-5">
@@ -30,6 +47,7 @@
 
     </div>
 </div>
+</section>
 {% endblock %}
 
 
