@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<!-- Search Bar -->
+<form id="search-form" class="mb-4" onsubmit="return false;">
+  <div class="row">
+    <div class="col-md-3">
+      <label for="search" class="form-label">Search for a Watch:</label>
+      <input type="text" id="search" class="form-control" placeholder="Search by name or brand...">
+    </div>
+  </div>
+</form>
+
 <!-- Brand Filter Form -->
 <form method="GET" action="{{ url_for('index') }}" class="mb-4">
   <div class="row">
@@ -19,55 +30,104 @@
   </div>
 </form>
 
-<!--Currency Conversion Form -->
+<!-- Currency Conversion Form -->
 <form method="GET" action="{{ url_for('index') }}" class="mb-4">
-    <div class = 'row'>
-        <div class="col-md-3">
-          <label for="currency" class="form-label">Currency:</label>
-          <select name="currency" id="currency" class="form-select">
-            <option value="EUR" {% if selected_currency == 'EUR' %}selected{% endif %}>Euro (€)</option>
-            <option value="USD" {% if selected_currency == 'USD' %}selected{% endif %}>US Dollar ($)</option>
-            <option value="GBP" {% if selected_currency == 'GBP' %}selected{% endif %}>British Pound (£)</option>
-            <option value="JPY" {% if selected_currency == 'JPY' %}selected{% endif %}>Japanese Yen (¥)</option>
-          </select>
-        </div>
-        <div class="col-md-2 mt-4">
-          <button type="submit" class="btn btn-primary w-100">Choose Currency</button>
-        </div>
+  <div class='row'>
+    <div class="col-md-3">
+      <label for="currency" class="form-label">Currency:</label>
+      <select name="currency" id="currency" class="form-select">
+        <option value="EUR" {% if selected_currency == 'EUR' %}selected{% endif %}>Euro (€)</option>
+        <option value="USD" {% if selected_currency == 'USD' %}selected{% endif %}>US Dollar ($)</option>
+        <option value="GBP" {% if selected_currency == 'GBP' %}selected{% endif %}>British Pound (£)</option>
+        <option value="JPY" {% if selected_currency == 'JPY' %}selected{% endif %}>Japanese Yen (¥)</option>
+      </select>
+    </div>
+    <div class="col-md-2 mt-4">
+      <button type="submit" class="btn btn-primary w-100">Choose Currency</button>
+    </div>
   </div>
 </form>
 
 <!-- Add Item Button -->
 <a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Item</a>
-<!--Section-->
-<section class="py-5">
-<div class="container px-4 px-lg-5 mt-5">
-    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-        {% for watch in watches %}
-        <div class="col mb-5">
-            <div class="card h-100">
-                <!-- Watch Image-->
-                <img class="card-img-top" src="{{ url_for('get_image', id=watch.id) }}" alt="..." width="100">
-                <!-- Watch Details-->
-                <div class="card-body p-4">
-                    <div class="text-center">
-                        <!-- Watch name-->
-                        <h5 class="fw-bolder">{{ watch.brand }} {{ watch.name }}</h5>
-                        <!-- Watch price-->
-                        {{ selected_currency }}  {{watch.price | round(2)}}
-                    </div>
-                </div>
-                <!--Button-->
-                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ url_for('view_watch',id=watch.id) }}">View</a></div>
-                </div>
-            </div>
-        </div>
-        {%  endfor %}
 
+<!-- Watch List Section -->
+<section class="py-5">
+  <div class="container px-4 px-lg-5 mt-5">
+    <div id="watch-list" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+      {% for watch in watches %}
+      <div class="col mb-5">
+        <div class="card h-100">
+          <!-- Watch Image-->
+          <img class="card-img-top" src="{{ url_for('get_image', id=watch.id) }}" alt="..." width="100">
+          <!-- Watch Details-->
+          <div class="card-body p-4">
+            <div class="text-center">
+              <!-- Watch name-->
+              <h5 class="fw-bolder">{{ watch.brand }} {{ watch.name }}</h5>
+              <!-- Watch price-->
+              {{ selected_currency }}  {{watch.price | round(2)}}
+            </div>
+          </div>
+          <!-- Button -->
+          <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+            <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{{ url_for('view_watch',id=watch.id) }}">View</a></div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-</div>
+  </div>
 </section>
+
 {% endblock %}
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search');
+    const watchList = document.getElementById('watch-list');
 
+    // Event listener for search input
+    searchInput.addEventListener('input', function() {
+      const searchQuery = this.value;
+
+      // Fetch filtered watches based on the search query
+      fetch(`/search_watches?query=${searchQuery}`)
+        .then(response => response.json())
+        .then(data => {
+          watchList.innerHTML = ''; // Clear current watch list
+
+          if (data.watches && data.watches.length > 0) {
+            data.watches.forEach(watch => {
+              const watchElement = document.createElement('div');
+              watchElement.classList.add('col', 'mb-5');
+              watchElement.innerHTML = `
+                <div class="card h-100">
+                  <img class="card-img-top" src="/image/${watch.id}" alt="..." width="100">
+                  <div class="card-body p-4">
+                    <div class="text-center">
+                      <h5 class="fw-bolder">${watch.brand} ${watch.name}</h5>
+                      ${data.selected_currency} ${watch.price.toFixed(2)}
+                    </div>
+                  </div>
+                  <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="/view_watch/${watch.id}">View</a></div>
+                  </div>
+                </div>
+              `;
+              watchList.appendChild(watchElement);
+            });
+          } else {
+            // If no watches are found, display a "no results" message
+            const noResultsMessage = document.createElement('div');
+            noResultsMessage.classList.add('col', 'mb-5');
+            noResultsMessage.innerHTML = '<p>No watches found. Try a different search.</p>';
+            watchList.appendChild(noResultsMessage);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching search results:', error);
+        });
+    });
+  });
+</script>

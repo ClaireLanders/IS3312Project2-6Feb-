@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
+from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session, jsonify
 import sqlite3
 import io
 import requests
@@ -139,6 +139,33 @@ def convert_currency(price, from_currency, to_currency):
         return round(price * rate, 2)
     return None
 
+# search watches
+@app.route('/search_watches', methods=['GET'])
+def search_watches():
+    search_query = request.args.get('query', '').lower()
+    conn = get_db_connection()
+
+    # Query watches based on the search query
+    query = 'SELECT id, name, price, brand FROM watches WHERE LOWER(name) LIKE ? OR LOWER(brand) LIKE ?'
+    params = [f'%{search_query}%', f'%{search_query}%']
+    watches = conn.execute(query, params).fetchall()
+    conn.close()
+
+    # Convert the fetched watches to a list of dictionaries
+    watch_list = [{
+        'id': watch['id'],
+        'name': watch['name'],
+        'price': round(watch['price'], 2),
+        'brand': watch['brand'],
+        'currency': request.args.get('currency', 'EUR')  # Ensure currency is included
+    } for watch in watches]
+
+    # debugging
+    print(f"Search query: {search_query}, Matches: {watch_list}")
+    return jsonify({
+        'watches': watch_list,
+        'selected_currency': request.args.get('currency', 'EUR')
+    })
 
 
 
@@ -147,26 +174,22 @@ def convert_currency(price, from_currency, to_currency):
 @app.route('/')
 def index():
     conn = get_db_connection()
-
-    # Get the brand filter value from the request
     brand_filter = request.args.get('brand')
+    currency = request.args.get('currency', 'EUR')
 
-    # Get the currency selection from the request
-    currency = request.args.get('currency', 'EUR')  # Default to EUR if no currency selected
-
-    # Convert the watch prices to the selected currency
+    # Base query retrieves all watches
     query = 'SELECT id, name, price, brand FROM watches'
     params = []
 
-    # Apply filter if brand is provided
+    # Apply brand filter only if provided
     if brand_filter:
         query += ' WHERE brand = ?'
         params.append(brand_filter)
 
-    # Fetch the filtered or unfiltered watches
+    # Fetch all watches (filtered or not)
     watches = conn.execute(query, params).fetchall()
 
-    # Convert the prices based on selected currency
+    # Convert the prices based on the selected currency
     converted_watches = []
     for watch in watches:
         converted_price = convert_currency(watch['price'], 'EUR', currency)
@@ -178,12 +201,7 @@ def index():
         })
 
     conn.close()
-
     return render_template('index.html', watches=converted_watches, selected_currency=currency)
-
-
-
-
 
 
 # Viewing a single watch
@@ -233,7 +251,6 @@ def edit(id):
         image = request.files['image']
         description = request.form['description']
         stock = request.form['stock']
-        image = request.files['image']
 
         image_data = None
         if image and image.filename != '':
