@@ -3,20 +3,19 @@ import sqlite3
 import io
 import requests
 
-
+# Initialise the flask application
 app = Flask(__name__)
 # setting a secret key for secure sessions
 app.secret_key = 'cab55a52341d5763e41fb92c77241b02'
 
-# Database connection function
+# Database connection function: returns a connection to the SQLite Database
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row  # Access rows as dictionaries
     return conn
 
 
-# Login route from project deliverable 1
-# Login route
+# Login route - handles user login with POST and GET methods
 @app.route('/login',methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -24,13 +23,12 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-
-        # Fetch user from the database using the username
+        # Query the database to check if the user exists
         conn = get_db_connection()
         user = conn.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         conn.close()
 
-        # check if user exists
+       # Validate user credentials
         if user is None:
             flash('Invalid username or password', category='danger')
             return redirect(url_for('login'))
@@ -50,7 +48,7 @@ def login():
     # Render login page
     return render_template('login.html')
 
-# Registration route for customer
+# Registration route for customers
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
@@ -58,7 +56,7 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        role = 'customer'  # Default role
+        role = 'customer'  # Default role for new users
 
         # Validate if the username or email already exists
         conn = get_db_connection()
@@ -90,7 +88,7 @@ def register_admin():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-        role = 'admin'  # Default role
+        role = 'admin'  # Role set as 'admin'
 
         # Validate if the username or email already exists
         conn = get_db_connection()
@@ -143,15 +141,13 @@ def admin():
     return render_template('admin_home.html', users=users, username=username, watches=watches)
 
 
-# Currency conversion function
-
-# Currency conversion function
+# Currency conversion function:  Uses an external API to get exchange rates
 def get_exchange_rate(base_currency, target_currency):
     api_key = "85a7ddc39aa3b807e052560d40a7ab96"
     url = f"https://api.exchangeratesapi.io/v1/latest?access_key={api_key}&base={base_currency}&symbols={target_currency}"
     try:
         response = requests.get(url)
-        response.raise_for_status()
+        response.raise_for_status() # Raise error for unsuccessful responses
         data = response.json()
         if data.get("success"):
             return data["rates"].get(target_currency)
@@ -162,10 +158,10 @@ def get_exchange_rate(base_currency, target_currency):
         print("HTTP Request failed:", e)
         return None
 
-# Convert currency
+# Convert currency: Convert price based on currency exchange rate
 def convert_currency(price, from_currency, to_currency):
     if from_currency == to_currency:
-        return price
+        return price # No conversion if currencies are the same
     rate = get_exchange_rate(from_currency, to_currency)
     if rate is not None:
         return round(price * rate, 2)
@@ -192,17 +188,13 @@ def search_watches():
         'currency': request.args.get('currency', 'EUR')  # Ensure currency is included
     } for watch in watches]
 
-    # debugging
-    print(f"Search query: {search_query}, Matches: {watch_list}")
     return jsonify({
         'watches': watch_list,
         'selected_currency': request.args.get('currency', 'EUR')
     })
 
 
-
-# Home page to display all watches and users at the moment!
-# it currently only shows name and description, but I will add brand and other stuff later
+# Home page that displays all watches, with optional brand filter and currency conversion
 @app.route('/')
 def index():
     conn = get_db_connection()
@@ -213,7 +205,7 @@ def index():
     query = 'SELECT id, name, price, brand FROM watches'
     params = []
 
-    # Apply brand filter only if provided
+    # Apply brand filter if specified
     if brand_filter:
         query += ' WHERE brand = ?'
         params.append(brand_filter)
@@ -244,26 +236,26 @@ def view_watch(id):
     conn.close()
 
     if watch:
-        # render product details page if product exists
+        # render product details page if found
         return render_template('watch.html', watch=watch)
     else:
         # return error if product is not found
         return flash('Product not found', category='danger')
 
 
-
-# Create or Edit a watch item - maybe make this admin only ?
+# Edit or add a new watch
 @app.route('/edit/<int:id>', methods=('GET', 'POST'))
 @app.route('/add', methods=('GET', 'POST'), defaults={'id': None})
 def edit(id):
     conn = get_db_connection()
 
-    # If editing, fetch item
+    # If editing, fetch current watch item
     item = None
     if id:
         item = conn.execute('SELECT * FROM watches WHERE id = ?', (id,)).fetchone()
 
     if request.method == 'POST':
+        # Retrieve form data for creating or updating watch details
         name = request.form['name']
         brand = request.form['brand']
         price = request.form['price']
@@ -286,7 +278,7 @@ def edit(id):
 
         image_data = None
         if image and image.filename != '':
-            image_data = image.read()  # Convert file to BLOB
+            image_data = image.read()  # Convert image to BLOB
 
         if id:  # Update existing item
             if image_data:
@@ -318,7 +310,7 @@ def edit(id):
 
         conn.commit()
         conn.close()
-        return redirect(url_for('index'))
+        return redirect(url_for('admin'))
 
     conn.close()
     return render_template('edit.html', item=item)
@@ -326,11 +318,14 @@ def edit(id):
 # Delete an item
 @app.route('/delete/<int:id>')
 def delete(id):
+    # Establish connection to the database
     conn = get_db_connection()
+    # Delete the product from the database by its ID
     conn.execute('DELETE FROM watches WHERE id = ?', (id,))
     conn.commit()
     conn.close()
-    return redirect(url_for('index'))
+    flash('Item deleted successfully.', category='success')
+    return redirect(url_for('admin'))
 
 # Fetch image from database
 @app.route('/image/<int:id>')
@@ -344,16 +339,6 @@ def get_image(id):
     return '', 404  # Return 404 if no image is found
 
 
-# Display all users
-# When I have the page in - this will show on the admin page
-@app.route('/users')
-def users():
-    conn = get_db_connection()
-    users = conn.execute('SELECT id, username, email FROM users').fetchall()
-    conn.close()
-    return render_template('users.html', users=users)
-
-
 # Delete user
 @app.route('/delete_user/<int:id>')
 def delete_user(id):
@@ -361,6 +346,7 @@ def delete_user(id):
     conn.execute('DELETE FROM users WHERE id = ?', (id,))
     conn.commit()
     conn.close()
+    flash('User deleted successfully.', category='success')
     return redirect(url_for('index'))
 
 # Cart
@@ -389,6 +375,7 @@ def add_to_cart(id):
     return redirect(url_for('view_cart'))
 
 
+# View Cart
 @app.route('/cart')
 def view_cart():
     # Retrieve cart from the session
@@ -402,7 +389,7 @@ def view_cart():
     # Filter out None values in case of invalid or deleted watch IDs
     watches = [watch for watch in watches if watch is not None]
 
-    # Calculate the total price
+    # Calculate the total price of the items in the cart
     total_price = sum(watch['price'] for watch in watches)
 
     return render_template('cart.html', watches=watches,total_price=total_price)
@@ -427,7 +414,6 @@ def remove_from_cart(id):
 # Checkout route
 @app.route('/checkout')
 def checkout():
-    # Sample logic for checkout, could display basket contents
     return render_template('checkout.html')
 
 

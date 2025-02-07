@@ -11,6 +11,7 @@
 
                         <!-- Add Item Button -->
                         <a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Product</a>
+                        <!-- Add Admin Button -->
                         <a href="{{ url_for('register_admin', id=None) }}" class="btn btn-primary mb-3">Add new Admin</a>
                         <!--list of registered users-->
                         <div class="card mb-4">
@@ -34,7 +35,6 @@
                                             <td>{{user.username}}</td>
                                             <td>{{ user.email}}</td>
                                             <td>{{ user.role }}</td>
-                                            <!-- ADDING THE EDIT AND DELETE BUTTONS FROM THE ABOVE EDITING -->
                                             <td>
                                                 <a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm">Delete</a>
                                             </td>
@@ -69,7 +69,6 @@
                                                 {% endif %}</td>
                                             <td>{{ watch.name}}</td>
                                             <td>{{ watch.brand }}</td>
-                                            <!-- ADDING THE EDIT AND DELETE BUTTONS FROM THE ABOVE EDITING -->
                                             <td>
                                                 <a href="{{ url_for('edit', id=watch.id) }}" class="btn btn-warning btn-sm">Edit</a>
                                                 <a href="{{ url_for('delete', id=watch.id) }}" class="btn btn-danger btn-sm">Delete</a>
