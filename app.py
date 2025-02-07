@@ -50,7 +50,7 @@ def login():
     # Render login page
     return render_template('login.html')
 
-# Registration route
+# Registration route for customer
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if request.method == 'POST':
@@ -82,6 +82,37 @@ def register():
     # Render the registration page
     return render_template('register.html')
 
+# Admin Registration route
+@app.route('/register_admin', methods=['POST', 'GET'])
+def register_admin():
+    if request.method == 'POST':
+        # Get registration details from the form
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        role = 'admin'  # Default role
+
+        # Validate if the username or email already exists
+        conn = get_db_connection()
+        existing_user = conn.execute('SELECT * FROM users WHERE username = ? OR email = ?', (username, email)).fetchone()
+        conn.close()
+
+        if existing_user:
+            flash('Username or Email already exists. Please choose a different one.', category='danger')
+            return redirect(url_for('register_admin'))
+
+        # Insert the new user into the database
+        conn = get_db_connection()
+        conn.execute('INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)',
+                     (username, password, email, role))
+        conn.commit()
+        conn.close()
+
+        flash('Account created successfully! Please log in.', category='success')
+        return redirect(url_for('login'))
+
+    # Render the registration page
+    return render_template('register_admin.html')
 
 # Logout route
 @app.route('/logout')
@@ -99,16 +130,17 @@ def admin():
         flash('You must be logged in to access the admin page.', category='danger')
         return redirect(url_for('login'))
 
-    # Get all registered user for the data on the admin page and render template
+    # Get all registered user and watch data on the admin page and render template
     conn = get_db_connection();
     users = conn.execute('SELECT * FROM users ').fetchall()
+    watches = conn.execute('SELECT * FROM watches').fetchall()
     conn.close()
 
     # get the logged - in username
     username = session['username']
 
     # render the admin page with user data
-    return render_template('admin_home.html', users=users, username=username)
+    return render_template('admin_home.html', users=users, username=username, watches=watches)
 
 
 # Currency conversion function

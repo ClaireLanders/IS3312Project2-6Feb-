@@ -2,19 +2,22 @@
 
 {% block content %}
 <!-- Search Bar -->
-<form id="search-form" class="mb-4" onsubmit="return false;">
-  <div class="row">
-    <div class="col-md-3">
-      <label for="search" class="form-label">Search for a Watch:</label>
-      <input type="text" id="search" class="form-control" placeholder="Search by name or brand...">
+<div class="mb-4">
+  <form id="search-form" class="d-flex justify-content-center">
+    <div class="input-group w-50">
+      <input type="text" id="search" class="form-control" placeholder="Search by name or brand..." aria-label="Search for a watch">
+      <button class="btn btn-outline-secondary" type="submit" id="search-button">
+        <i class="bi bi-search"></i> <!-- Bootstrap search icon -->
+      </button>
     </div>
-  </div>
-</form>
+  </form>
+</div>
 
-<!-- Brand Filter Form -->
-<form method="GET" action="{{ url_for('index') }}" class="mb-4">
-  <div class="row">
-    <div class="col-md-3">
+<!-- Filters Section (Aligned to the Left) -->
+<div class="mb-4">
+  <form method="GET" action="{{ url_for('index') }}" class="d-flex justify-content-start">
+    <!-- Brand Filter -->
+    <div class="me-3">
       <label for="brand" class="form-label">Filter by Brand:</label>
       <select name="brand" id="brand" class="form-select">
         <option value="">All Brands</option>
@@ -24,16 +27,9 @@
         <option value="Audemars Piguet" {% if request.args.get('brand') == 'Audemars Piguet' %}selected{% endif %}>Audemars Piguet</option>
       </select>
     </div>
-    <div class="col-md-2 mt-4">
-      <button type="submit" class="btn btn-primary w-100">Filter</button>
-    </div>
-  </div>
-</form>
 
-<!-- Currency Conversion Form -->
-<form method="GET" action="{{ url_for('index') }}" class="mb-4">
-  <div class='row'>
-    <div class="col-md-3">
+    <!-- Currency Filter -->
+    <div class="me-3">
       <label for="currency" class="form-label">Currency:</label>
       <select name="currency" id="currency" class="form-select">
         <option value="EUR" {% if selected_currency == 'EUR' %}selected{% endif %}>Euro (€)</option>
@@ -42,14 +38,14 @@
         <option value="JPY" {% if selected_currency == 'JPY' %}selected{% endif %}>Japanese Yen (¥)</option>
       </select>
     </div>
-    <div class="col-md-2 mt-4">
-      <button type="submit" class="btn btn-primary w-100">Choose Currency</button>
-    </div>
-  </div>
-</form>
 
-<!-- Add Item Button -->
-<a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Item</a>
+    <!-- Apply Filters Button -->
+    <div class="align-self-end">
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </div>
+  </form>
+</div>
+
 
 <!-- Watch List Section -->
 <section class="py-5">

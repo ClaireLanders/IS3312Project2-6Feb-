@@ -8,44 +8,11 @@
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">Welcome {{ username}} !</li>
                         </ol>
-                        <div class="row">
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">Inventory Levels</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">Total Sales</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">User Activity</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-md-6">
-                                <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">Number of Users</div>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">View Details</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+                        <!-- Add Item Button -->
+                        <a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Product</a>
+                        <a href="{{ url_for('register_admin', id=None) }}" class="btn btn-primary mb-3">Add new Admin</a>
+                        <!--list of registered users-->
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
@@ -70,6 +37,42 @@
                                             <!-- ADDING THE EDIT AND DELETE BUTTONS FROM THE ABOVE EDITING -->
                                             <td>
                                                 <a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm">Delete</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Products
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Image</th>
+                                            <th>Name</th>
+                                            <th>Brand</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for watch in watches %}
+                                        <tr>
+                                            <td>{% if watch.id %}
+                                                <img src="{{ url_for('get_image', id=watch.id) }}" alt="Item Image" width="100">
+                                                {% else %}
+                                                    No Image
+                                                {% endif %}</td>
+                                            <td>{{ watch.name}}</td>
+                                            <td>{{ watch.brand }}</td>
+                                            <!-- ADDING THE EDIT AND DELETE BUTTONS FROM THE ABOVE EDITING -->
+                                            <td>
+                                                <a href="{{ url_for('edit', id=watch.id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                                <a href="{{ url_for('delete', id=watch.id) }}" class="btn btn-danger btn-sm">Delete</a>
                                             </td>
                                         </tr>
                                         {% endfor %}
