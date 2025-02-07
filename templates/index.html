@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- Filter Form -->
+<!-- Brand Filter Form -->
 <form method="GET" action="{{ url_for('index') }}" class="mb-4">
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-3">
       <label for="brand" class="form-label">Filter by Brand:</label>
       <select name="brand" id="brand" class="form-select">
         <option value="">All Brands</option>
         <option value="Rolex" {% if request.args.get('brand') == 'Rolex' %}selected{% endif %}>Rolex</option>
         <option value="Omega" {% if request.args.get('brand') == 'Omega' %}selected{% endif %}>Omega</option>
         <option value="Patek Philippe" {% if request.args.get('brand') == 'Patek Philippe' %}selected{% endif %}>Patek Philippe</option>
-        <option value="Audemars Piguet"{% if request.args.get('brand') == 'Audemars Piguet' %}selected{% endif %}>Audemars Piguet</option>
+        <option value="Audemars Piguet" {% if request.args.get('brand') == 'Audemars Piguet' %}selected{% endif %}>Audemars Piguet</option>
       </select>
     </div>
     <div class="col-md-2 mt-4">
@@ -18,6 +18,26 @@
     </div>
   </div>
 </form>
+
+<!--Currency Conversion Form -->
+<form method="GET" action="{{ url_for('index') }}" class="mb-4">
+    <div class = 'row'>
+        <div class="col-md-3">
+          <label for="currency" class="form-label">Currency:</label>
+          <select name="currency" id="currency" class="form-select">
+            <option value="EUR" {% if selected_currency == 'EUR' %}selected{% endif %}>Euro (€)</option>
+            <option value="USD" {% if selected_currency == 'USD' %}selected{% endif %}>US Dollar ($)</option>
+            <option value="GBP" {% if selected_currency == 'GBP' %}selected{% endif %}>British Pound (£)</option>
+            <option value="JPY" {% if selected_currency == 'JPY' %}selected{% endif %}>Japanese Yen (¥)</option>
+          </select>
+        </div>
+        <div class="col-md-2 mt-4">
+          <button type="submit" class="btn btn-primary w-100">Choose Currency</button>
+        </div>
+  </div>
+</form>
+
+<!-- Add Item Button -->
 <a href="{{ url_for('edit', id=None) }}" class="btn btn-primary mb-3">Add Item</a>
 <!--Section-->
 <section class="py-5">
@@ -34,7 +54,7 @@
                         <!-- Watch name-->
                         <h5 class="fw-bolder">{{ watch.brand }} {{ watch.name }}</h5>
                         <!-- Watch price-->
-                        €{{watch.price}}
+                        {{ selected_currency }}  {{watch.price | round(2)}}
                     </div>
                 </div>
                 <!--Button-->

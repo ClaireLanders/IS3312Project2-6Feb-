@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
 import sqlite3
 import io
+import requests
+
 
 app = Flask(__name__)
 # setting a secret key for secure sessions
@@ -108,6 +110,38 @@ def admin():
     # render the admin page with user data
     return render_template('admin_home.html', users=users, username=username)
 
+
+# Currency conversion function
+
+# Currency conversion function
+def get_exchange_rate(base_currency, target_currency):
+    api_key = "85a7ddc39aa3b807e052560d40a7ab96"
+    url = f"https://api.exchangeratesapi.io/v1/latest?access_key={api_key}&base={base_currency}&symbols={target_currency}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data["rates"].get(target_currency)
+        else:
+            print("Error in API response:", data.get("error"))
+            return None
+    except requests.RequestException as e:
+        print("HTTP Request failed:", e)
+        return None
+
+# Convert currency
+def convert_currency(price, from_currency, to_currency):
+    if from_currency == to_currency:
+        return price
+    rate = get_exchange_rate(from_currency, to_currency)
+    if rate is not None:
+        return round(price * rate, 2)
+    return None
+
+
+
+
 # Home page to display all watches and users at the moment!
 # it currently only shows name and description, but I will add brand and other stuff later
 @app.route('/')
@@ -117,10 +151,10 @@ def index():
     # Get the brand filter value from the request
     brand_filter = request.args.get('brand')
 
-    # Print the brand filter value for debugging
-    print(f"Brand Filter: {brand_filter}")
+    # Get the currency selection from the request
+    currency = request.args.get('currency', 'EUR')  # Default to EUR if no currency selected
 
-    # Base query to fetch watches
+    # Convert the watch prices to the selected currency
     query = 'SELECT id, name, price, brand FROM watches'
     params = []
 
@@ -129,18 +163,26 @@ def index():
         query += ' WHERE brand = ?'
         params.append(brand_filter)
 
-    # Print the query and parameters for debugging
-    print(f"Query: {query}, Params: {params}")
-
     # Fetch the filtered or unfiltered watches
     watches = conn.execute(query, params).fetchall()
 
-    # Fetch users (not necessary for the index, but included in your original code)
-    users = conn.execute('SELECT id, username, email, role FROM users').fetchall()
+    # Convert the prices based on selected currency
+    converted_watches = []
+    for watch in watches:
+        converted_price = convert_currency(watch['price'], 'EUR', currency)
+        converted_watches.append({
+            'id': watch['id'],
+            'name': watch['name'],
+            'price': converted_price,
+            'brand': watch['brand']
+        })
 
     conn.close()
 
-    return render_template('index.html', watches=watches, users=users)
+    return render_template('index.html', watches=converted_watches, selected_currency=currency)
+
+
+
 
 
 
