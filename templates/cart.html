@@ -65,16 +65,6 @@
                                         <div class="d-flex justify-content-between align-items-center mb-4">
                                           <h5 class="mb-0">Card details</h5>
                                         </div>
-
-                                        <p class="small mb-2">Card type</p>
-                                        <a href="#!" type="submit" class="text-white"><i
-                                            class="fab fa-cc-mastercard fa-2x me-2"></i></a>
-                                        <a href="#!" type="submit" class="text-white"><i
-                                            class="fab fa-cc-visa fa-2x me-2"></i></a>
-                                        <a href="#!" type="submit" class="text-white"><i
-                                            class="fab fa-cc-amex fa-2x me-2"></i></a>
-                                        <a href="#!" type="submit" class="text-white"><i class="fab fa-cc-paypal fa-2x"></i></a>
-
                                         <form class="mt-4">
                                           <div class="form-outline form-white mb-4">
                                             <input type="text" id="typeName" class="form-control form-control-lg" size="17"
@@ -109,24 +99,16 @@
 
                                         <hr class="my-4">
 
-                                        <div class="d-flex justify-content-between">
-                                          <p class="mb-2">Subtotal</p>
-                                          <p class="mb-2">€4618</p>
-                                        </div>
 
-                                        <div class="d-flex justify-content-between">
-                                          <p class="mb-2">Shipping</p>
-                                          <p class="mb-2">€20.00</p>
-                                        </div>
 
                                         <div class="d-flex justify-content-between mb-4">
-                                          <p class="mb-2">Total(Incl. taxes)</p>
-                                          <p class="mb-2">€4818</p>
+                                          <p class="mb-2">Total</p>
+                                          <p class="mb-2">{{ total_price }}</p>
                                         </div>
 
                                         <button type="button" class="btn btn-info btn-block btn-lg">
                                           <div class="d-flex justify-content-between">
-                                            <span>€4818.00 </span>
+                                            <span> </span>
                                             <span>Checkout <i class="fas fa-long-arrow-alt-right ms-2"></i></span>
                                           </div>
                                         </button>

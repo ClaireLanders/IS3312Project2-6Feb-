@@ -402,7 +402,10 @@ def view_cart():
     # Filter out None values in case of invalid or deleted watch IDs
     watches = [watch for watch in watches if watch is not None]
 
-    return render_template('cart.html', watches=watches)
+    # Calculate the total price
+    total_price = sum(watch['price'] for watch in watches)
+
+    return render_template('cart.html', watches=watches,total_price=total_price)
 
 
 # Remove product from cart
