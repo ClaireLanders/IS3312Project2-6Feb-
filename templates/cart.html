@@ -106,13 +106,12 @@
                                           <p class="mb-2">{{ total_price }}</p>
                                         </div>
 
-                                        <button type="button" class="btn btn-info btn-block btn-lg">
+                                        <button type="button" class="btn btn-info btn-block btn-lg" onclick="window.location.href='{{ url_for('checkout') }}'">
                                           <div class="d-flex justify-content-between">
-                                            <span> </span>
+                                            <span></span>
                                             <span>Checkout <i class="fas fa-long-arrow-alt-right ms-2"></i></span>
                                           </div>
                                         </button>
-
                                       </div>
                                     </div>
 

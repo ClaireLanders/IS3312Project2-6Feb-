@@ -424,5 +424,13 @@ def remove_from_cart(id):
     return redirect(url_for('view_cart'))
 
 
+# Checkout route
+@app.route('/checkout')
+def checkout():
+    # Sample logic for checkout, could display basket contents
+    return render_template('checkout.html')
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
