@@ -78,52 +78,7 @@
 
 {% endblock %}
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search');
-    const watchList = document.getElementById('watch-list');
+{% block script %}
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+{% endblock %}
 
-    // Event listener for search input
-    searchInput.addEventListener('input', function() {
-      const searchQuery = this.value;
-
-      // Fetch filtered watches based on the search query
-      fetch(`/search_watches?query=${searchQuery}`)
-        .then(response => response.json())
-        .then(data => {
-          watchList.innerHTML = ''; // Clear current watch list
-
-          if (data.watches && data.watches.length > 0) {
-            data.watches.forEach(watch => {
-              const watchElement = document.createElement('div');
-              watchElement.classList.add('col', 'mb-5');
-              watchElement.innerHTML = `
-                <div class="card h-100">
-                  <img class="card-img-top" src="/image/${watch.id}" alt="..." width="100">
-                  <div class="card-body p-4">
-                    <div class="text-center">
-                      <h5 class="fw-bolder">${watch.brand} ${watch.name}</h5>
-                      ${data.selected_currency} ${watch.price.toFixed(2)}
-                    </div>
-                  </div>
-                  <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="/view_watch/${watch.id}">View</a></div>
-                  </div>
-                </div>
-              `;
-              watchList.appendChild(watchElement);
-            });
-          } else {
-            // If no watches are found, display a "no results" message
-            const noResultsMessage = document.createElement('div');
-            noResultsMessage.classList.add('col', 'mb-5');
-            noResultsMessage.innerHTML = '<p>No watches found. Try a different search.</p>';
-            watchList.appendChild(noResultsMessage);
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching search results:', error);
-        });
-    });
-  });
-</script>
