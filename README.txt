@@ -3,8 +3,8 @@ This project is a Flask-based e-commerce application designed to showcase watche
 reqistration, login, cart management and an admin panel to manage products and users.
 
 Product Browsing:
-- All users can browse all the products and view the single products on the index page.
-- They can search for the watch model and brand in the search bar, and the watches matching the search will filter as the
+- All users can browse all the products and view the single products.
+- They can search for the watch model and/or brand in the search bar, and the watches matching the search will filter as the
   user types.
 - The user can filter the watch results by brand.
 - The user can also convert the price of the watches to other currencies.
